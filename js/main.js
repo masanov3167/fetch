@@ -43,19 +43,69 @@ let films;
 const modalArr = [];
 
 const modal = document.createElement("div");
-modal.classList.add("modal", "display-none");
+modal.classList.add("modal");
 document.body.appendChild(modal);
 
+const modalLoader = document.createElement("img");
+modalLoader.classList.add("modal-loader");
+modalLoader.setAttribute("src", "https://acegif.com/wp-content/uploads/loading-78.gif");
+
+const modalImg = document.createElement("img");
+modalImg.classList.add("modal-img");
+
+const modalBody = document.createElement("div");
+modalBody.classList.add("modal-body");
+
 const modalTitle = document.createElement("h3");
-modalTitle.classList.add("modal-title"); 
-modal.appendChild(modalTitle);
+modalBody.appendChild(modalTitle); 
 
 const modalYear = document.createElement("time");
-modal.appendChild(modalYear);
+modalBody.appendChild(modalYear);
+
+const modalRate = document.createElement("p");
+modalBody.appendChild(modalRate);
+
+const modalReleased = document.createElement("p");
+modalBody.appendChild(modalReleased);
+
+const modalRuntime = document.createElement("time");
+modalBody.appendChild(modalRuntime);
+
+const modalGenre = document.createElement("p");
+modalBody.appendChild(modalGenre);
+
+const modalDirector = document.createElement("p");
+modalBody.appendChild(modalDirector);
+
+const modalWriter = document.createElement("p");
+modalBody.appendChild(modalWriter);
+
+const modalActors = document.createElement("p");
+modalBody.appendChild(modalActors);
+
+const modalLanguage = document.createElement("p");
+modalBody.appendChild(modalLanguage);
+
+const modalCountry = document.createElement("p");
+modalBody.appendChild(modalCountry);
+
+const modalAwards = document.createElement("p");
+modalBody.appendChild(modalAwards);
 
 const modalType = document.createElement("p");
-modalType.classList.add("modal-type");
-modal.appendChild(modalType);
+modalBody.appendChild(modalType);
+
+const modalPlot = document.createElement("p");
+modalPlot.classList.add("modal-plot");
+modalBody.appendChild(modalPlot);
+
+const modalRatings = document.createElement("p");
+modalRatings.classList.add("modal-ratings");
+modalBody.appendChild(modalRatings);
+
+const ratingList = document.createElement("ol");
+ratingList.classList.add("rating-list");
+modalBody.appendChild(ratingList);
 
 form.addEventListener("submit", evt =>{
     evt.preventDefault();
@@ -74,21 +124,58 @@ form.addEventListener("submit", evt =>{
 
 list.addEventListener("click", evt =>{
     if(evt.target.matches(".more")){
+        modal.innerHTML = null;
+        modal.appendChild(modalLoader);
+        modalLoader.classList.remove("display-none");
         main.style.opacity = 0.2;
-        modal.classList.remove("display-none");
+        modal.classList.add("show");
         const btnId = evt.target.dataset.moreId;
 
         const find = films.find(a => a.imdbID == btnId);
-        modalArr.push(find);
 
-        modalArr.forEach(a => {
-            modalTitle.innerHTML = `<span class="movies-span">Title:</span> ${a.Title}`;
-            modalYear.innerHTML = `<span class="movies-span">Year:</span> ${a.Year}`;
-            modalType.innerHTML = `<span class="movies-span">Type:</span> ${a.Type}`;
-        })
+            async function name(){
+                const res = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${find.Title}&plot=full`);
+                const data = await res.json();
+
+                 setTimeout( () =>{
+                    modalLoader.classList.add("display-none");
+                    
+                    modal.appendChild(modalImg);
+                    modalImg.setAttribute("src", data.Poster);
+                    modalImg.addEventListener("error", () =>{
+                        modalImg.setAttribute("src", "https://picsum.photos/250/300");
+                    });
+
+                    modal.appendChild(modalBody);
+                    modalTitle.innerHTML = `<span class="white">Title: </span>${data.Title}`;
+                    modalYear.innerHTML = `<span class="white">Year: </span>${data.Year}`;
+                    modalRate.innerHTML = `<span class="white">Rated: </span>${data.Rated}`;
+                    modalReleased.innerHTML = `<span class="white">Released: </span>${data.Released}`;
+                    modalRuntime.innerHTML = `<span class="white">Run time: </span>${data.Runtime}`;
+                    modalGenre.innerHTML = `<span class="white">Genres: </span>${data.Genre}`;
+                    modalDirector.innerHTML = `<span class="white">Director: </span>${data.Director}`;
+                    modalWriter.innerHTML = `<span class="white">Writer: </span>${data.Writer}`;
+                    modalActors.innerHTML = `<span class="white">Actors: </span>${data.Actors}`;
+                    modalPlot.innerHTML = `<span>More info</span>${data.Plot}`;
+                    modalLanguage.innerHTML = `<span class="white">Language: </span>${data.Language}`;
+                    modalCountry.innerHTML = `<span class="white">Country: </span>${data.Country}`;
+                    modalAwards.innerHTML = `<span class="white">Awards: </span>${data.Awards}`;
+                    modalRatings.innerHTML = `<span class="white">Ratings: </span>`;
+
+                    data.Ratings.forEach(a =>{
+                        let Rating = document.createElement("li");
+                        Rating.innerHTML = `<p></p><span class="white">Source: </span>${a.Source} </p>
+                        <p class="value">  <span class="white">Value: </span>${a.Value}</p>`
+                        ratingList.appendChild(Rating);
+                    });
+                    modalType.innerHTML = `<span class="white">Type: </span>${data.Type}`;
+                 }, 1000);
+            }
+            name();
     }
     else{
         main.style.opacity = 1;
-        modal.classList.add("display-none");
+        modal.classList.remove("show");
+        modal.innerHTML = null;
     }
 })
