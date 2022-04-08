@@ -134,7 +134,7 @@ list.addEventListener("click", evt =>{
         const find = films.find(a => a.imdbID == btnId);
 
             async function name(){
-                const res = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${find.Title}&plot=full`);
+                const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&t=${find.Title}&plot=full`);
                 const data = await res.json();
 
                  setTimeout( () =>{
